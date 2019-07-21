@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.TvDetailActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/detail_tv_poster"
+            android:layout_width="150dp"
+            android:layout_height="230dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/tv_show_poster"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/poster_doom_patrol" />
+
+        <TextView
+            android:id="@+id/detail_tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/detail_tv_poster"
+            app:layout_constraintTop_toTopOf="@+id/detail_tv_poster"
+            tools:text="Doom Patrol" />
+
+        <TextView
+            android:id="@+id/detail_tv_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_title"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_title"
+            tools:text="Drama" />
+
+        <TextView
+            android:id="@+id/detail_separator_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/item_separator"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_genre"
+            app:layout_constraintStart_toEndOf="@+id/detail_tv_genre"
+            app:layout_constraintTop_toTopOf="@id/detail_tv_genre" />
+
+        <TextView
+            android:id="@+id/detail_tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_genre"
+            app:layout_constraintStart_toEndOf="@+id/detail_separator_first"
+            app:layout_constraintTop_toTopOf="@+id/detail_tv_genre"
+            tools:text="2h 12m" />
+
+        <TextView
+            android:id="@+id/detail_separator_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/item_separator"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_genre"
+            app:layout_constraintStart_toEndOf="@+id/detail_tv_duration"
+            app:layout_constraintTop_toTopOf="@id/detail_tv_genre" />
+
+        <TextView
+            android:id="@+id/detail_tv_release_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_genre"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/detail_separator_second"
+            app:layout_constraintTop_toTopOf="@+id/detail_tv_genre"
+            tools:text="2 Jun 19" />
+
+        <TextView
+            android:id="@+id/detail_tv_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/default_rating"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_title"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_genre" />
+
+        <TextView
+            android:id="@+id/detail_max_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/max_rating"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_rating"
+            app:layout_constraintStart_toEndOf="@+id/detail_tv_rating"
+            app:layout_constraintTop_toTopOf="@+id/detail_tv_rating" />
+
+        <TextView
+            android:id="@+id/detail_imdb"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/circle_corner"
+            android:gravity="center"
+            android:text="@string/imdb"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_max_rating"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/detail_max_rating"
+            app:layout_constraintTop_toTopOf="@+id/detail_max_rating" />
+
+        <TextView
+            android:id="@+id/detail_tv_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:lineSpacingMultiplier="1.2"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_poster"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_actor"
+            tools:text="@string/aquaman_desc" />
+
+        <TextView
+            android:id="@+id/text_director"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/director"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="@+id/text_season"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_episode" />
+
+        <TextView
+            android:id="@+id/detail_tv_director"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/text_director"
+            app:layout_constraintEnd_toEndOf="@+id/detail_tv_season"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_season"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_episode"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="James Wan" />
+
+        <TextView
+            android:id="@+id/text_actor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/actor"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="@+id/text_season"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_director" />
+
+        <TextView
+            android:id="@+id/detail_tv_actor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_poster"
+            app:layout_constraintEnd_toEndOf="@+id/detail_tv_season"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_director"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_director"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="Jason Momoa, Amber Heard, Willem Dafoe" />
+
+        <TextView
+            android:id="@+id/text_plot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/plot"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_description" />
+
+        <TextView
+            android:id="@+id/detail_tv_plot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="@string/aquaman_plot"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_plot"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/text_season"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/tv_seasons"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_title"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_rating" />
+
+        <TextView
+            android:id="@+id/text_tv_episode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/tv_episodes"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="@+id/text_season"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_season" />
+
+        <TextView
+            android:id="@+id/detail_tv_season"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@+id/text_season"
+            tools:text="1" />
+
+        <TextView
+            android:id="@+id/detail_tv_episode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/detail_tv_season"
+            app:layout_constraintStart_toStartOf="@+id/detail_tv_season"
+            app:layout_constraintTop_toBottomOf="@+id/detail_tv_season"
+            tools:text="2" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="235dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
