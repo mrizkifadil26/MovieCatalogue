@@ -2,6 +2,7 @@ package com.example.moviecatalogue.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,24 +14,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviecatalogue.R;
 import com.example.moviecatalogue.activity.MovieDetailActivity;
-import com.example.moviecatalogue.model.Movie;
+import com.example.moviecatalogue.model.MovieGenre;
+import com.example.moviecatalogue.model.MovieResults;
+import com.example.moviecatalogue.util.Config;
 import com.google.android.material.card.MaterialCardView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     private Context context;
-    private ArrayList<Movie> movies;
+    private List<MovieResults> movies;
+    private List<MovieGenre> genres;
 
     public MovieAdapter(Context context) {
         this.context = context;
-        movies = new ArrayList<>();
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
+    public void setMovies(List<MovieResults> movies, List<MovieGenre> genres) {
         this.movies = movies;
+        this.genres = genres;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -42,36 +48,34 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, final int position) {
-        final Movie movie = movies.get(position);
+        final MovieResults movie = movies.get(position);
+        String imageUrl = Config.IMAGE_URL + movie.getMoviePoster();
 
         Picasso.get()
-                .load(movie.getMoviePoster())
+                .load(imageUrl)
                 .into(holder.moviePoster);
 
         holder.movieTitle.setText(movie.getMovieTitle());
-        holder.movieDescription.setText(movie.getMovieDescription());
-        holder.movieGenre.setText(movie.getMovieGenre());
-        holder.movieDuration.setText(movie.getMovieDuration());
-        holder.movieReleaseDate.setText(movie.getMovieReleaseDate());
-        if (!movie.getMovieRating().equals("")) {
-            holder.movieRating.setText(movie.getMovieRating());
-        } else {
-            holder.movieRating.setText(R.string.default_rating);
+        holder.movieRating.setText(String.valueOf(movie.getMovieRating()));
+
+        if (genres != null) {
+            holder.movieGenre.setText(holder.getMovieGenres(movies.get(position).getGenreId()));
         }
 
-        holder.movieParent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(context, MovieDetailActivity.class);
-                mIntent.putParcelableArrayListExtra(MovieDetailActivity.EXTRA_MOVIE, movies.get(position));
-                context.startActivity(mIntent);
-            }
+        holder.movieParent.setOnClickListener(view -> {
+            Intent mIntent = new Intent(context, MovieDetailActivity.class);
+            mIntent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movies.get(position));
+            context.startActivity(mIntent);
         });
     }
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        if (movies != null) {
+            return movies.size();
+        } else {
+            return 0;
+        }
     }
 
     class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -79,23 +83,29 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         ImageView moviePoster;
         TextView movieTitle;
         TextView movieGenre;
-        TextView movieDuration;
-        TextView movieReleaseDate;
         TextView movieRating;
-        TextView movieDescription;
         MaterialCardView movieParent;
 
         MovieViewHolder(@NonNull View itemView) {
             super(itemView);
             movieParent = itemView.findViewById(R.id.movie_parent);
-            moviePoster = itemView.findViewById(R.id.item_poster);
-            movieTitle = itemView.findViewById(R.id.item_title);
-            movieGenre = itemView.findViewById(R.id.item_genre);
-            movieDuration = itemView.findViewById(R.id.item_duration);
-            movieReleaseDate = itemView.findViewById(R.id.item_release_date);
-            movieRating = itemView.findViewById(R.id.item_rating);
-            movieDescription = itemView.findViewById(R.id.item_description);
+            moviePoster = itemView.findViewById(R.id.movie_poster);
+            movieTitle = itemView.findViewById(R.id.movie_title);
+            movieGenre = itemView.findViewById(R.id.movie_genre);
+            movieRating = itemView.findViewById(R.id.movie_rating);
+        }
+
+        private String getMovieGenres(List<Integer> genreIds) {
+            List<String> movieGenres = new ArrayList<>();
+            for (Integer genreId : genreIds) {
+                for (MovieGenre genre : genres) {
+                    if (genre.getId() == genreId) {
+                        movieGenres.add(genre.getName());
+                        break;
+                    }
+                }
+            }
+            return TextUtils.join(" | ", movieGenres);
         }
     }
-
 }

@@ -2,41 +2,35 @@ package com.example.moviecatalogue.fragment;
 
 
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviecatalogue.R;
 import com.example.moviecatalogue.adapter.TvShowAdapter;
-import com.example.moviecatalogue.model.TvShow;
+import com.example.moviecatalogue.model.TvShowGenre;
+import com.example.moviecatalogue.model.TvShowResults;
+import com.example.moviecatalogue.viewmodel.TvShowViewModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class TvShowFragment extends Fragment {
 
-    private String[] tvTitle;
-    private String[] tvGenre;
-    private String[] tvDuration;
-    private String[] tvReleaseDate;
-    private String[] tvRating;
-    private String[] tvSeason;
-    private String[] tvEpisode;
-    private String[] tvDescription;
-    private String[] tvCreator;
-    private String[] tvActor;
-    private String[] tvPlot;
-    private TypedArray tvPoster;
-
     private TvShowAdapter tvAdapter;
+    private ProgressBar tvProgress;
+    private List<TvShowGenre> tvGenres;
 
     public TvShowFragment() {
         // Required empty public constructor
@@ -47,62 +41,47 @@ public class TvShowFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        return inflater.inflate(R.layout.fragment_tv_shows, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         int orientation = getResources().getConfiguration().orientation;
+        RecyclerView recyclerTv = view.findViewById(R.id.item_tv);
 
-        View rootView = inflater.inflate(R.layout.fragment_tv_shows, container, false);
-        RecyclerView recyclerTv = rootView.findViewById(R.id.item_tv);
+        tvProgress = view.findViewById(R.id.progress_tv);
+        tvProgress.setVisibility(View.VISIBLE);
 
-        tvAdapter = new TvShowAdapter(getActivity());
         if (orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerTv.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+            recyclerTv.setLayoutManager(new GridLayoutManager(view.getContext(), 2));
         } else {
-            recyclerTv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayout.HORIZONTAL, false));
+            recyclerTv.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayout.HORIZONTAL, false));
         }
+
+        tvAdapter = new TvShowAdapter(view.getContext());
         recyclerTv.setAdapter(tvAdapter);
 
-        prepare();
-        addItem();
-
-        return rootView;
+        TvShowViewModel tvShowViewModel = ViewModelProviders.of(this).get(TvShowViewModel.class);
+        tvShowViewModel.getTvFromRetrofit().observe(this, getTvShowData);
+        tvShowViewModel.getTvGenreFromRetrofit().observe(this, getTvShowGenreData);
     }
 
-    private void prepare() {
-        tvPoster  = getResources().obtainTypedArray(R.array.tv_poster);
-        tvTitle = getResources().getStringArray(R.array.tv_title);
-        tvReleaseDate = getResources().getStringArray(R.array.tv_release_date);
-        tvGenre = getResources().getStringArray(R.array.tv_genre);
-        tvDuration = getResources().getStringArray(R.array.tv_duration);
-        tvRating = getResources().getStringArray(R.array.tv_rating);
-        tvSeason = getResources().getStringArray(R.array.tv_season);
-        tvEpisode = getResources().getStringArray(R.array.tv_episode);
-        tvDescription = getResources().getStringArray(R.array.tv_description);
-        tvCreator = getResources().getStringArray(R.array.tv_director);
-        tvActor = getResources().getStringArray(R.array.tv_actor);
-        tvPlot = getResources().getStringArray(R.array.tv_plot);
-    }
-
-    private void addItem() {
-
-        ArrayList<TvShow> tvShows = new ArrayList<>();
-
-        for (int i = 0; i < tvTitle.length; i++) {
-            TvShow tvShow = new TvShow();
-            tvShow.setTvPoster(tvPoster.getResourceId(i, -1));
-            tvShow.setTvTitle(tvTitle[i]);
-            tvShow.setTvGenre(tvGenre[i]);
-            tvShow.setTvDuration(tvDuration[i]);
-            tvShow.setTvReleaseDate(tvReleaseDate[i]);
-            tvShow.setTvRating(tvRating[i]);
-            tvShow.setTvSeason(tvSeason[i]);
-            tvShow.setTvEpisode(tvEpisode[i]);
-            tvShow.setTvDescription(tvDescription[i]);
-            tvShow.setTvDirector(tvCreator[i]);
-            tvShow.setTvActor(tvActor[i]);
-            tvShow.setTvPlot(tvPlot[i]);
-            tvShows.add(tvShow);
+    private final Observer<List<TvShowResults>> getTvShowData = new Observer<List<TvShowResults>>() {
+        @Override
+        public void onChanged(List<TvShowResults> tvShowResults) {
+            tvAdapter.setTvShows(tvShowResults, tvGenres);
+            tvAdapter.notifyDataSetChanged();
+            tvProgress.setVisibility(View.GONE);
         }
+    };
 
-        tvAdapter.setTvShows(tvShows);
-    }
-
+    private final Observer<List<TvShowGenre>> getTvShowGenreData = new Observer<List<TvShowGenre>>() {
+        @Override
+        public void onChanged(List<TvShowGenre> tvShowGenres) {
+            tvGenres = tvShowGenres;
+        }
+    };
 }

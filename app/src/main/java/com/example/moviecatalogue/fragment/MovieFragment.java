@@ -1,37 +1,38 @@
 package com.example.moviecatalogue.fragment;
 
 
-import android.content.res.TypedArray;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviecatalogue.R;
 import com.example.moviecatalogue.adapter.MovieAdapter;
-import com.example.moviecatalogue.model.Movie;
+import com.example.moviecatalogue.model.MovieGenre;
+import com.example.moviecatalogue.model.MovieResults;
+import com.example.moviecatalogue.viewmodel.MovieViewModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class MovieFragment extends Fragment {
 
-    private String[] movieTitle;
-    private String[] movieGenre;
-    private String[] movieDuration;
-    private String[] movieReleaseDate;
-    private String[] movieRating;
-    private String[] movieDescription;
-    private String[] movieDirector;
-    private String[] movieActor;
-    private String[] moviePlot;
-    private TypedArray moviePoster;
-
     private MovieAdapter movieAdapter;
+    private ProgressBar movieProgress;
+    private List<MovieGenre> genres;
+
+    private RecyclerView movieRecycler;
 
     public MovieFragment() {
         // Required empty public constructor
@@ -41,51 +42,45 @@ public class MovieFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View parentLayout = inflater.inflate(R.layout.fragment_movie, container, false);
-        RecyclerView recyclerMovie = parentLayout.findViewById(R.id.item_movie);
-
-        movieAdapter = new MovieAdapter(getActivity());
-        recyclerMovie.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerMovie.setAdapter(movieAdapter);
-
-        prepare();
-        addItem();
-
-        return parentLayout;
+        return inflater.inflate(R.layout.fragment_movie, container, false);
     }
 
-    private void prepare() {
-        moviePoster = getResources().obtainTypedArray(R.array.movie_poster);
-        movieTitle = getResources().getStringArray(R.array.movie_title);
-        movieReleaseDate = getResources().getStringArray(R.array.movie_release_date);
-        movieGenre = getResources().getStringArray(R.array.movie_genre);
-        movieDuration = getResources().getStringArray(R.array.movie_duration);
-        movieRating = getResources().getStringArray(R.array.movie_rating);
-        movieDescription = getResources().getStringArray(R.array.movie_description);
-        movieDirector = getResources().getStringArray(R.array.movie_director);
-        movieActor = getResources().getStringArray(R.array.movie_actor);
-        moviePlot = getResources().getStringArray(R.array.movie_plot);
-    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        int orientation = getResources().getConfiguration().orientation;
+        movieRecycler = view.findViewById(R.id.item_movie);
+        movieProgress = view.findViewById(R.id.progress_movie);
 
-    private void addItem() {
-
-        ArrayList<Movie> movies = new ArrayList<>();
-
-        for (int i = 0; i < movieTitle.length; i++) {
-            Movie movie = new Movie();
-            movie.setMoviePoster(moviePoster.getResourceId(i, -1));
-            movie.setMovieTitle(movieTitle[i]);
-            movie.setMovieGenre(movieGenre[i]);
-            movie.setMovieDuration(movieDuration[i]);
-            movie.setMovieReleaseDate(movieReleaseDate[i]);
-            movie.setMovieRating(movieRating[i]);
-            movie.setMovieDescription(movieDescription[i]);
-            movie.setMovieDirector(movieDirector[i]);
-            movie.setMovieActor(movieActor[i]);
-            movie.setMoviePlot(moviePlot[i]);
-            movies.add(movie);
+        movieProgress.setVisibility(View.VISIBLE);
+        if (orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            movieRecycler.setLayoutManager(new GridLayoutManager(view.getContext(), 2));
+        } else {
+            movieRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayout.HORIZONTAL, false));
         }
 
-        movieAdapter.setMovies(movies);
+        movieAdapter = new MovieAdapter(view.getContext());
+
+        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        movieViewModel.getMovieGenreFromRetrofit().observe(this, getGenreData);
+        movieViewModel.getMovieFromRetrofit().observe(this, getMovieData);
     }
+
+    private final Observer<List<MovieResults>> getMovieData = new Observer<List<MovieResults>>() {
+        @Override
+        public void onChanged(List<MovieResults> movieResults) {
+            movieAdapter.setMovies(movieResults, genres);
+            movieAdapter.notifyDataSetChanged();
+            movieRecycler.setAdapter(movieAdapter);
+            movieProgress.setVisibility(View.GONE);
+        }
+    };
+
+    private final Observer<List<MovieGenre>> getGenreData = new Observer<List<MovieGenre>>() {
+        @Override
+        public void onChanged(List<MovieGenre> genreResults) {
+            genres = genreResults;
+        }
+    };
+
 }

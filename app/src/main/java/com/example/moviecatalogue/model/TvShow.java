@@ -1,170 +1,94 @@
 package com.example.moviecatalogue.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
-public class TvShow extends ArrayList<Parcelable> implements Parcelable {
+import com.example.moviecatalogue.service.ApiService;
+import com.example.moviecatalogue.service.RetrofitService;
+import com.example.moviecatalogue.util.Config;
 
-    private int tvPoster;
-    private String tvTitle;
-    private String tvGenre;
-    private String tvDuration;
-    private String tvReleaseDate;
-    private String tvRating;
-    private String tvDescription;
+import java.util.List;
 
-    private String tvActor;
-    private String tvDirector;
-    private String tvSeason;
-    private String tvEpisode;
-    private String tvPlot;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    public TvShow() {
+public class TvShow {
+
+    private ApiService apiService;
+    private static TvShow tvShow;
+
+    private TvShow(ApiService apiService) {
+        this.apiService = apiService;
     }
 
-    public int getTvPoster() {
-        return tvPoster;
-    }
-
-    public void setTvPoster(int tvPoster) {
-        this.tvPoster = tvPoster;
-    }
-
-    public String getTvTitle() {
-        return tvTitle;
-    }
-
-    public void setTvTitle(String tvTitle) {
-        this.tvTitle = tvTitle;
-    }
-
-    public String getTvGenre() {
-        return tvGenre;
-    }
-
-    public void setTvGenre(String tvGenre) {
-        this.tvGenre = tvGenre;
-    }
-
-    public String getTvDuration() {
-        return tvDuration;
-    }
-
-    public void setTvDuration(String tvDuration) {
-        this.tvDuration = tvDuration;
-    }
-
-    public String getTvReleaseDate() {
-        return tvReleaseDate;
-    }
-
-    public void setTvReleaseDate(String tvReleaseDate) {
-        this.tvReleaseDate = tvReleaseDate;
-    }
-
-    public String getTvRating() {
-        return tvRating;
-    }
-
-    public void setTvRating(String tvRating) {
-        this.tvRating = tvRating;
-    }
-
-    public String getTvDescription() {
-        return tvDescription;
-    }
-
-    public void setTvDescription(String tvDescription) {
-        this.tvDescription = tvDescription;
-    }
-
-    public String getTvActor() {
-        return tvActor;
-    }
-
-    public void setTvActor(String tvActor) {
-        this.tvActor = tvActor;
-    }
-
-    public String getTvDirector() {
-        return tvDirector;
-    }
-
-    public void setTvDirector(String tvDirector) {
-        this.tvDirector = tvDirector;
-    }
-
-    public String getTvSeason() {
-        return tvSeason;
-    }
-
-    public void setTvSeason(String tvSeason) {
-        this.tvSeason = tvSeason;
-    }
-
-    public String getTvEpisode() {
-        return tvEpisode;
-    }
-
-    public void setTvEpisode(String tvEpisode) {
-        this.tvEpisode = tvEpisode;
-    }
-
-    public String getTvPlot() {
-        return tvPlot;
-    }
-
-    public void setTvPlot(String tvPlot) {
-        this.tvPlot = tvPlot;
-    }
-
-    private TvShow(Parcel in) {
-        tvPoster = in.readInt();
-        tvTitle = in.readString();
-        tvGenre = in.readString();
-        tvDuration = in.readString();
-        tvReleaseDate = in.readString();
-        tvRating = in.readString();
-        tvDescription = in.readString();
-        tvActor = in.readString();
-        tvDirector = in.readString();
-        tvSeason = in.readString();
-        tvEpisode = in.readString();
-        tvPlot = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(tvPoster);
-        dest.writeString(tvTitle);
-        dest.writeString(tvGenre);
-        dest.writeString(tvDuration);
-        dest.writeString(tvReleaseDate);
-        dest.writeString(tvRating);
-        dest.writeString(tvDescription);
-        dest.writeString(tvActor);
-        dest.writeString(tvDirector);
-        dest.writeString(tvSeason);
-        dest.writeString(tvEpisode);
-        dest.writeString(tvPlot);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<TvShow> CREATOR = new Creator<TvShow>() {
-        @Override
-        public TvShow createFromParcel(Parcel in) {
-            return new TvShow(in);
+    public static TvShow getInstance() {
+        if (tvShow == null) {
+            tvShow = new TvShow(RetrofitService.createService(ApiService.class));
         }
+        return tvShow;
+    }
 
-        @Override
-        public TvShow[] newArray(int size) {
-            return new TvShow[size];
-        }
-    };
+    public MutableLiveData<List<TvShowResults>> getTvFromRetrofit() {
+        final MutableLiveData<List<TvShowResults>> tvShows = new MutableLiveData<>();
+        apiService.getTvFromApi(Config.API_KEY).enqueue(new Callback<TvShowResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<TvShowResponse> call, @NonNull Response<TvShowResponse> response) {
+                if (response.body() != null) {
+                    tvShows.setValue(response.body().getResults());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TvShowResponse> call, @NonNull Throwable t) {
+                Log.e("TvShow Model", "onFailure: " + t.getMessage());
+            }
+        });
+        return tvShows;
+    }
+
+    public MutableLiveData<List<TvShowGenre>> getTvGenreFromRetrofit() {
+        final MutableLiveData<List<TvShowGenre>> tvGenres = new MutableLiveData<>();
+        apiService.getTvGenreFromApi(Config.API_KEY).enqueue(new Callback<TvShowGenreResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<TvShowGenreResponse> call, @NonNull Response<TvShowGenreResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        tvGenres.setValue(response.body().getTvShowGenres());
+                    }
+                }
+                Log.d("Genre Results", "onResponse: " + response.message());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TvShowGenreResponse> call, @NonNull Throwable t) {
+                Log.e("Tv Genre Model", "onFailure: " + t.getMessage());
+            }
+        });
+        return tvGenres;
+    }
+
+    public MutableLiveData<TvShowDetail> getTvDetailFromRetrofit(int id, String apiKey) {
+        final MutableLiveData<TvShowDetail> tvDetails = new MutableLiveData<>();
+        apiService.getTvDetailFromApi(id, apiKey).enqueue(new Callback<TvShowDetail>() {
+            @Override
+            public void onResponse(@NonNull Call<TvShowDetail> call, @NonNull Response<TvShowDetail> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        tvDetails.setValue(response.body());
+                    }
+                }
+                Log.d("Tv Detail Results", "onResponse: " + response.message());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TvShowDetail> call, @NonNull Throwable t) {
+                Log.e("Tv Detail", "onFailure: " + t.getMessage());
+            }
+        });
+        return tvDetails;
+    }
+
 }

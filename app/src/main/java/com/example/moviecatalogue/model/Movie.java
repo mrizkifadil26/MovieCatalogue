@@ -1,148 +1,96 @@
 package com.example.moviecatalogue.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
-public class Movie extends ArrayList<Parcelable> implements Parcelable {
+import com.example.moviecatalogue.service.ApiService;
+import com.example.moviecatalogue.service.RetrofitService;
+import com.example.moviecatalogue.util.Config;
 
-    private int moviePoster;
-    private String movieTitle;
-    private String movieGenre;
-    private String movieDuration;
-    private String movieReleaseDate;
-    private String movieRating;
-    private String movieDescription;
+import java.util.List;
 
-    private String movieActor;
-    private String movieDirector;
-    private String moviePlot;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    public Movie() {
+public class Movie {
+
+    private ApiService apiService;
+    private static Movie movie;
+
+    private Movie(ApiService apiService) {
+        this.apiService = apiService;
     }
 
-    private Movie(Parcel in) {
-        moviePoster = in.readInt();
-        movieTitle = in.readString();
-        movieGenre = in.readString();
-        movieDuration = in.readString();
-        movieReleaseDate = in.readString();
-        movieRating = in.readString();
-        movieDescription = in.readString();
-        movieActor = in.readString();
-        movieDirector = in.readString();
-        moviePlot = in.readString();
-    }
-
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
+    public static Movie getInstance() {
+        if (movie == null) {
+            movie = new Movie(RetrofitService.createService(ApiService.class));
         }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
-
-    public int getMoviePoster() {
-        return moviePoster;
+        return movie;
     }
 
-    public void setMoviePoster(int moviePoster) {
-        this.moviePoster = moviePoster;
+    public MutableLiveData<List<MovieResults>> getMovieFromRetrofit() {
+        final MutableLiveData<List<MovieResults>> movies = new MutableLiveData<>();
+        apiService.getMovieFromApi(Config.API_KEY).enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        movies.setValue(response.body().getResults());
+                    }
+                }
+                Log.d("Movie Results", "onResponse: " + response.message());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieResponse> call, @NonNull Throwable t) {
+                Log.e("Movie Model", "onFailure: " + t.getMessage());
+            }
+        });
+        return movies;
     }
 
-    public String getMovieTitle() {
-        return movieTitle;
+    public MutableLiveData<List<MovieGenre>> getMovieGenreFromRetrofit() {
+        final MutableLiveData<List<MovieGenre>> genres = new MutableLiveData<>();
+        apiService.getMovieGenreFromApi(Config.API_KEY).enqueue(new Callback<MovieGenreResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieGenreResponse> call, @NonNull Response<MovieGenreResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        genres.setValue(response.body().getGenres());
+                    }
+                }
+                Log.d("Movie Genre Results", "onResponse: " + response.message());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieGenreResponse> call, @NonNull Throwable t) {
+                Log.e("Genre Model", "onFailure: " + t.getMessage());
+            }
+        });
+        return genres;
     }
 
-    public void setMovieTitle(String movieTitle) {
-        this.movieTitle = movieTitle;
-    }
+    public MutableLiveData<MovieDetail> getMovieDetailFromRetrofit(int id, String apiKey) {
+        final MutableLiveData<MovieDetail> movieDetail = new MutableLiveData<>();
+        apiService.getMovieDetailFromApi(id, apiKey).enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieDetail> call, @NonNull Response<MovieDetail> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        movieDetail.setValue(response.body());
+                    }
+                }
+                Log.d("Movie Detail Results", "onResponse: " + response.message());
+            }
 
-    public String getMovieGenre() {
-        return movieGenre;
-    }
-
-    public void setMovieGenre(String movieGenre) {
-        this.movieGenre = movieGenre;
-    }
-
-    public String getMovieDuration() {
-        return movieDuration;
-    }
-
-    public void setMovieDuration(String movieDuration) {
-        this.movieDuration = movieDuration;
-    }
-
-    public String getMovieReleaseDate() {
-        return movieReleaseDate;
-    }
-
-    public void setMovieReleaseDate(String movieReleaseDate) {
-        this.movieReleaseDate = movieReleaseDate;
-    }
-
-    public String getMovieRating() {
-        return movieRating;
-    }
-
-    public void setMovieRating(String movieRating) {
-        this.movieRating = movieRating;
-    }
-
-    public String getMovieDescription() {
-        return movieDescription;
-    }
-
-    public void setMovieDescription(String movieDescription) {
-        this.movieDescription = movieDescription;
-    }
-
-    public String getMovieActor() {
-        return movieActor;
-    }
-
-    public void setMovieActor(String movieActor) {
-        this.movieActor = movieActor;
-    }
-
-    public String getMovieDirector() {
-        return movieDirector;
-    }
-
-    public void setMovieDirector(String movieDirector) {
-        this.movieDirector = movieDirector;
-    }
-
-    public String getMoviePlot() {
-        return moviePlot;
-    }
-
-    public void setMoviePlot(String moviePlot) {
-        this.moviePlot = moviePlot;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(moviePoster);
-        parcel.writeString(movieTitle);
-        parcel.writeString(movieGenre);
-        parcel.writeString(movieDuration);
-        parcel.writeString(movieReleaseDate);
-        parcel.writeString(movieRating);
-        parcel.writeString(movieDescription);
-        parcel.writeString(movieActor);
-        parcel.writeString(movieDirector);
-        parcel.writeString(moviePlot);
+            @Override
+            public void onFailure(@NonNull Call<MovieDetail> call, @NonNull Throwable t) {
+                Log.e("Movie Detail", "onFailure: " + t.getMessage());
+            }
+        });
+        return movieDetail;
     }
 }
